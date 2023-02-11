@@ -1,18 +1,16 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const initialSupply = '10000000000000000000000'; // 10e4 * 1e18
+  const POGToken = await ethers.getContractFactory("POGToken");
+  
+  console.log('Deploying POGToken...');
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  const token = await POGToken.deploy(initialSupply);
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  await token.deployed();
 
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  console.log(`POGToken has been deployed to ${token.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
