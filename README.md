@@ -2,6 +2,10 @@
 
 This project demonstrates a basic ERC20 contract, based on HardHat project structure.
 
+Etherscan Goerli token page: [PogChamp Token](https://goerli.etherscan.io/token/0x8aADCf1ba17cFbD3D8b7A6230D1B2CFBE658d24D).
+
+Useful commands:
+
 ```shell
 npx hardhat help
 npx hardhat test
