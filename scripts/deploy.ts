@@ -1,12 +1,14 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const initialSupply = '10000000000000000000000'; // 10e4 * 1e18
+  const initialSupply = (10 ** 9).toString();
   const POGToken = await ethers.getContractFactory("POGToken");
   
   console.log('Deploying POGToken...');
 
-  const token = await POGToken.deploy(initialSupply);
+  const token = await await POGToken.deploy(
+    ethers.utils.parseEther(initialSupply),
+  );
 
   await token.deployed();
 
