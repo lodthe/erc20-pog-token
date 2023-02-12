@@ -1,4 +1,4 @@
-# Sample Hardhat Project
+# PogToken
 
 This project demonstrates a basic ERC20 contract, based on HardHat project structure.
 
@@ -7,11 +7,9 @@ Etherscan Goerli token page: [PogChamp Token](https://goerli.etherscan.io/token/
 Useful commands:
 
 ```shell
-npx hardhat help
 npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
+npx hardhat test
+npx hardhat run scripts/deploy.ts --network goerli
 ```
 
 Credits to:
