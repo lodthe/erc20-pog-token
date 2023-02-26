@@ -85,7 +85,7 @@ describe('Token contract', function () {
 	});
 
   describe('Changing supply', function () {
-		describe('Minting new tokens', function() {
+        describe('Minting new tokens', function() {
       it('Minting new tokens', async function () {
         // Mint new tokens and validate balance and supply.
         const initialBalance = await POGToken.balanceOf(addrAlice.address);
@@ -131,4 +131,42 @@ describe('Token contract', function () {
       });
     });
 	});
+
+    describe('Viewers', function() {
+        describe('Adding', function() {
+            it('Success', async function () {
+                await expect(
+                    POGToken.addViewer(addrAlice.address, 'alice', true)
+                ).to.emit(POGToken, "LogViewerAdded").withArgs(addrAlice.address, 'alice');
+            });
+
+            it('Failure, already exists', async function () {
+                await expect(
+                    POGToken.addViewer(addrAlice.address, 'alice', true)
+                ).to.emit(POGToken, "LogViewerAdded").withArgs(addrAlice.address, 'alice');
+
+                await expect(
+                    POGToken.addViewer(addrAlice.address, 'alice', true)
+                ).to.be.revertedWith('A viewer with the given address has already been added');
+            });
+        });
+
+        describe('Removing', function() {
+            it('Success', async function () {
+                await expect(
+                    POGToken.addViewer(addrAlice.address, 'alice', true)
+                ).to.emit(POGToken, "LogViewerAdded").withArgs(addrAlice.address, 'alice');
+
+                await expect(
+                    POGToken.removeViewer(addrAlice.address)
+                ).to.emit(POGToken, "LogViewerRemoved").withArgs(addrAlice.address, 'alice');
+            });
+
+            it('Failure, not found', async function () {
+                await expect(
+                    POGToken.removeViewer(addrAlice.address)
+                ).to.be.revertedWith('Viewer not found');
+            });
+        });
+    });
 });
