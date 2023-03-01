@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"math/big"
 
-	"poginteractor/abi"
+	"poginteractor/contract"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -20,7 +20,7 @@ type Client struct {
 	privateKey string
 
 	cli      *ethclient.Client
-	instance *abi.POGToken
+	instance *contract.POGToken
 }
 
 func NewClient(infuraURL, rawPrivateKey, contractAddress string) (*Client, error) {
@@ -30,18 +30,18 @@ func NewClient(infuraURL, rawPrivateKey, contractAddress string) (*Client, error
 	if rawPrivateKey == "" {
 		return nil, errors.New("missed private key")
 	}
-	if contractAddress == "" {
-		return nil, errors.New("missed contract address")
-	}
 
 	cli, err := ethclient.Dial(infuraURL)
 	if err != nil {
 		return nil, fmt.Errorf("dial failed: %w", err)
 	}
 
-	instance, err := abi.NewPOGToken(common.HexToAddress(contractAddress), cli)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create contract instance: %w", err)
+	var instance *contract.POGToken
+	if contractAddress != "" {
+		instance, err = contract.NewPOGToken(common.HexToAddress(contractAddress), cli)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create contract instance: %w", err)
+		}
 	}
 
 	return &Client{
@@ -77,11 +77,25 @@ func (c *Client) prepareAuth() (*bind.TransactOpts, error) {
 
 	opts := bind.NewKeyedTransactor(privateKey)
 	opts.Nonce = big.NewInt(int64(nonce))
-	opts.Value = big.NewInt(0)     // in wei
-	opts.GasLimit = uint64(300000) // in units
+	opts.Value = big.NewInt(0) // in wei
+	opts.GasLimit = 0
 	opts.GasPrice = gasPrice
 
 	return opts, nil
+}
+
+func (c *Client) Deploy(supply *big.Int) (common.Address, *types.Transaction, error) {
+	opts, err := c.prepareAuth()
+	if err != nil {
+		return common.Address{}, nil, fmt.Errorf("auth failed: %w", err)
+	}
+
+	addr, tx, _, err := contract.DeployPOGToken(opts, c.cli, supply)
+	if err != nil {
+		return common.Address{}, nil, fmt.Errorf("failed to deploy contract: %w", err)
+	}
+
+	return addr, tx, nil
 }
 
 func (c *Client) AddViewer(address string, username string) (*types.Transaction, error) {

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"math/big"
 	"os"
 )
 
@@ -24,6 +25,14 @@ func main() {
 	}
 
 	switch os.Args[2] {
+	case "deploy":
+		addr, tx, err := client.Deploy(big.NewInt(1_000_000_000))
+		if err != nil {
+			log.Fatal("failed to deploy:", err)
+		}
+
+		fmt.Printf("deployed successfully\ntx: \t%s\naddress: \t%s\n", tx.Hash(), addr)
+
 	case "add":
 		if len(os.Args) < 5 {
 			log.Fatal("not enough arguments (provide address and username)")
